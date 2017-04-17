@@ -50,7 +50,7 @@ public class HttpClientUtil {
         return content;
     }
     public static void main(String[] args) {
-    	String url="http://dict.youdao.com/jsonapi?q=accolade";
+    	String url="http://dict.youdao.com/jsonapi?q=put";
 		System.out.println(url);
 		String contentString=HttpClientUtil.get(url);
 		System.out.println(contentString);

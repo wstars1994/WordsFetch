@@ -62,19 +62,23 @@ public class ExcelUtil {
 	        // 3、创建单元格(Label)对象，  
 	        Label label1 = new Label(0, 0, "名称");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 	        Label label2 = new Label(1, 0, "音标");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
-	        Label label3 = new Label(2, 0, "释义");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
-	        Label label4 = new Label(3, 0, "例句英文");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
-	        Label label5 = new Label(4, 0, "例句中文");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+	        Label label3 = new Label(2, 0, "中文释义");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+	        Label label4 = new Label(3, 0, "英文释义");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+	        Label label5 = new Label(4, 0, "例句英文");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+	        Label label6 = new Label(5, 0, "例句中文");// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 	        firstSheet.addCell(label1);
 	        firstSheet.addCell(label2);
 	        firstSheet.addCell(label3);
 	        firstSheet.addCell(label4);
 	        firstSheet.addCell(label5);
+	        firstSheet.addCell(label6);
 	        for(int i=0;i<mapData.size();i++){
 	        	Label name = new Label(0, i+1, mapData.get(i).get("name"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        Label phonic = new Label(1, i+1, mapData.get(i).get("phone"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+		        Label tras = new Label(1, i+1, mapData.get(i).get("tras"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        firstSheet.addCell(name);
 		        firstSheet.addCell(phonic);
+		        firstSheet.addCell(tras);
 		        if(mapData.get(i).get("para")!=null){
 		        	Label para = new Label(2, i+1,mapData.get(i).get("para"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        	firstSheet.addCell(para);

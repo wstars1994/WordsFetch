@@ -130,6 +130,23 @@ public class WordsFrameMain extends JFrame implements Runnable{
 				JSONObject object=JSONObject.fromObject(string);
 				JSONObject simple=(JSONObject) object.get("simple");
 				System.out.println(str);
+				JSONObject ec=(JSONObject) object.get("ec");
+				if(ec!=null){
+					String tras="";
+					JSONArray ecWords=(JSONArray) ec.get("word");
+					JSONArray trs=(JSONArray) ((JSONObject)ecWords.get(0)).get("trs");
+					if(trs!=null){
+						for(int t=0;t<trs.size();t++){
+							JSONArray tr=(JSONArray)((JSONObject)trs.get(t)).get("tr");
+							JSONArray l=(JSONArray)((JSONObject)((JSONObject)tr.get(0)).get("l")).get("i");
+							tras+=l.get(0)+"#";
+						}
+					}
+					if(tras.length()>0){
+						tras=tras.substring(0, tras.length()-1);
+					}
+					map.put("tras",tras);
+				}
 				if(simple!=null){
 					JSONArray word=(JSONArray) simple.get("word");
 					String usphone="";
