@@ -1,22 +1,12 @@
 package com.saclass.main;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 public class HttpClientUtil {
@@ -50,7 +40,7 @@ public class HttpClientUtil {
         return content;
     }
     public static void main(String[] args) {
-    	String url="http://dict.youdao.com/jsonapi?q=put";
+    	String url="http://dict.youdao.com/jsonapi?q=frayed";
 		System.out.println(url);
 		String contentString=HttpClientUtil.get(url);
 		System.out.println(contentString);

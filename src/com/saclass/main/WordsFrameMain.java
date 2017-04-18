@@ -14,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.json.JSONArray;
@@ -24,12 +23,11 @@ import net.sf.json.JSONObject;
  * @author wxc
  *
  */
-public class WordsFrameMain extends JFrame implements Runnable{
+public class WordsFrameMain extends JFrame{
 	
 	private String[] btnText={"导入词汇","开始抓取"};
 	private JButton importBtn,startBtn;
 	private JPanel mainPanel;
-	private JTable wordsTable;
 	private JLabel wordsNumLabel,fetchNumLabel;
 	private Map<String, Object> wordsMap=null;
 	List<Map<String, String>> mapData=new ArrayList<>();
@@ -48,19 +46,14 @@ public class WordsFrameMain extends JFrame implements Runnable{
 		mainPanel=new JPanel();
 		importBtn=new JButton(btnText[0]);
 		startBtn=new JButton(btnText[1]);
-//		wordsTable=new JTable(rowData,columnNames);
-//		JScrollPane scrollPane = new JScrollPane(wordsTable);
 		//未加载则不显示开始按钮
 		startBtn.setEnabled(false);
 		mainPanel.add(importBtn);
 		mainPanel.add(startBtn);
-//		mainPanel.add(wordsTable);
-//		mainPanel.add(scrollPane);
 		mainPanel.add(wordsNumLabel);
 		mainPanel.add(fetchNumLabel);
 		this.addBtnListener(importBtn);
 		this.addBtnListener(startBtn);
-		
 		this.add(mainPanel);
 	}
 	private void addBtnListener(JButton btn){
@@ -74,7 +67,6 @@ public class WordsFrameMain extends JFrame implements Runnable{
 				if(e.getActionCommand().equals(btnText[1])){
 					startFetch();
 				}
-				
 			}
 		});
 	}
@@ -129,10 +121,9 @@ public class WordsFrameMain extends JFrame implements Runnable{
 				String string = HttpClientUtil.get(url= url.replaceAll(" ", "%20"));
 				JSONObject object=JSONObject.fromObject(string);
 				JSONObject simple=(JSONObject) object.get("simple");
-				System.out.println(str);
 				JSONObject ec=(JSONObject) object.get("ec");
+				String tras="";
 				if(ec!=null){
-					String tras="";
 					JSONArray ecWords=(JSONArray) ec.get("word");
 					JSONArray trs=(JSONArray) ((JSONObject)ecWords.get(0)).get("trs");
 					if(trs!=null){
@@ -145,17 +136,10 @@ public class WordsFrameMain extends JFrame implements Runnable{
 					if(tras.length()>0){
 						tras=tras.substring(0, tras.length()-1);
 					}
-					map.put("tras",tras);
 				}
+				map.put("tras",tras);
 				if(simple!=null){
-					JSONArray word=(JSONArray) simple.get("word");
-					String usphone="";
-					if(((JSONObject)word.get(0)).get("usphone")!=null)
-						usphone="["+((JSONObject)word.get(0)).get("usphone").toString()+"]";
-					else if(((JSONObject)word.get(0)).get("phone")!=null)
-						usphone="["+((JSONObject)word.get(0)).get("phone").toString()+"]";
-					else if(((JSONObject)word.get(0)).get("ukphone")!=null)
-						usphone="["+((JSONObject)word.get(0)).get("ukphone").toString()+"]";
+					String usphone=getPhonic(simple);
 					map.put("phone",usphone);
 					JSONObject collins=(JSONObject) object.get("collins");
 					if(collins!=null){
@@ -169,8 +153,6 @@ public class WordsFrameMain extends JFrame implements Runnable{
 
 							JSONObject tran_entry_object=(JSONObject)tran_entry2.get(0);
 							String tran=tran_entry_object.get("tran").toString();
-//							System.out.println("1."+HtmlUtil.delHTMLTag(tran));
-							
 							JSONObject exam_sents=(JSONObject)tran_entry_object.get("exam_sents");
 							map.put("para", "1."+HtmlUtil.delHTMLTag(tran));
 							if(exam_sents!=null){
@@ -178,6 +160,7 @@ public class WordsFrameMain extends JFrame implements Runnable{
 								for(int i=0;i<sent.size();i++){
 									map=new HashMap<>();
 									map.put("name", str);
+									map.put("tras",tras);
 									map.put("phone",usphone);
 									map.put("para", "1."+HtmlUtil.delHTMLTag(tran));
 									JSONObject en=(JSONObject)sent.get(i);
@@ -192,7 +175,6 @@ public class WordsFrameMain extends JFrame implements Runnable{
 								continue;
 							}
 						}
-					
 					}
 				}
 				mapData.add(map);
@@ -203,13 +185,19 @@ public class WordsFrameMain extends JFrame implements Runnable{
 		ExcelUtil.written(mapData);
 		JOptionPane.showMessageDialog(this.getContentPane(), "抓取完成", "系统信息", JOptionPane.WARNING_MESSAGE);
 	}
-	
+	private String getPhonic(JSONObject simple){
+		JSONArray word=(JSONArray) simple.get("word");
+		String usphone="";
+		if(((JSONObject)word.get(0)).get("usphone")!=null&&!"".equals(((JSONObject)word.get(0)).get("usphone").toString()))
+			usphone="["+((JSONObject)word.get(0)).get("usphone").toString()+"]";
+		else if(((JSONObject)word.get(0)).get("phone")!=null&&!"".equals(((JSONObject)word.get(0)).get("phone").toString()))
+			usphone="["+((JSONObject)word.get(0)).get("phone").toString()+"]";
+		else if(((JSONObject)word.get(0)).get("ukphone")!=null&&!"".equals(((JSONObject)word.get(0)).get("ukphone").toString()))
+			usphone="["+((JSONObject)word.get(0)).get("ukphone").toString()+"]";
+		return usphone;
+	}
 	public static void main(String[] args) {
 		WordsFrameMain frameMain=new WordsFrameMain();
 		frameMain.setVisible(true);
-	}
-	@Override
-	public void run() {
-		startFetch();
 	}
 }

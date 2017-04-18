@@ -75,16 +75,16 @@ public class ExcelUtil {
 	        for(int i=0;i<mapData.size();i++){
 	        	Label name = new Label(0, i+1, mapData.get(i).get("name"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        Label phonic = new Label(1, i+1, mapData.get(i).get("phone"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
-		        Label tras = new Label(1, i+1, mapData.get(i).get("tras"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+		        Label tras = new Label(2, i+1, mapData.get(i).get("tras"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        firstSheet.addCell(name);
 		        firstSheet.addCell(phonic);
 		        firstSheet.addCell(tras);
 		        if(mapData.get(i).get("para")!=null){
-		        	Label para = new Label(2, i+1,mapData.get(i).get("para"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+		        	Label para = new Label(3, i+1,mapData.get(i).get("para"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        	firstSheet.addCell(para);
 		        	if(mapData.get(i).get("sentence_en")!=null){
-		        		Label sentence_en = new Label(3, i+1, mapData.get(i).get("sentence_en"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
-		        		Label sentence_zh = new Label(4, i+1, mapData.get(i).get("sentence_zh"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+		        		Label sentence_en = new Label(4, i+1, mapData.get(i).get("sentence_en"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
+		        		Label sentence_zh = new Label(5, i+1, mapData.get(i).get("sentence_zh"));// 第一个参数指定单元格的列数、第二个参数指定单元格的行数，第三个指定写的字符串内容  
 		        		firstSheet.addCell(sentence_en);
 		        		firstSheet.addCell(sentence_zh);
 		        	}
