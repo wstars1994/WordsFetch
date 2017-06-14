@@ -3,6 +3,7 @@ package com.boomzz.main;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,12 +26,14 @@ import net.sf.json.JSONObject;
  */
 public class WordsFrameMain extends JFrame{
 	
-	private String[] btnText={"导入词汇","开始抓取"};
-	private JButton importBtn,startBtn;
+	private String[] btnText={"导入词汇","存为word","存为excel"};
+	private String wordPath=null;
+	private JButton importBtn,startBtn,importWordBtn;
 	private JPanel mainPanel;
 	private JLabel wordsNumLabel,fetchNumLabel;
 	private Map<String, Object> wordsMap=null;
 	List<Map<String, String>> mapData=new ArrayList<>();
+	List<Map<String, Object>> wordMap=new ArrayList<>();
 	public  WordsFrameMain() {
 		this.init();
 	}
@@ -45,14 +48,18 @@ public class WordsFrameMain extends JFrame{
 		fetchNumLabel.setVisible(false);
 		mainPanel=new JPanel();
 		importBtn=new JButton(btnText[0]);
-		startBtn=new JButton(btnText[1]);
+		importWordBtn=new JButton(btnText[1]);
+		startBtn=new JButton(btnText[2]);
 		//未加载则不显示开始按钮
 		startBtn.setEnabled(false);
+		importWordBtn.setEnabled(false);
 		mainPanel.add(importBtn);
+		mainPanel.add(importWordBtn);
 		mainPanel.add(startBtn);
 		mainPanel.add(wordsNumLabel);
 		mainPanel.add(fetchNumLabel);
 		this.addBtnListener(importBtn);
+		this.addBtnListener(importWordBtn);
 		this.addBtnListener(startBtn);
 		this.add(mainPanel);
 	}
@@ -65,7 +72,21 @@ public class WordsFrameMain extends JFrame{
 					importExcel();
 				}
 				if(e.getActionCommand().equals(btnText[1])){
-					startFetch();
+					wordPath = importWord();
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							startFetchForWord();
+						}
+					}).start();
+				}
+				if(e.getActionCommand().equals(btnText[2])){
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							startFetch();
+						}
+					}).start();
 				}
 			}
 		});
@@ -99,9 +120,11 @@ public class WordsFrameMain extends JFrame{
         			wordsNumLabel.setText("共加载了"+wordsMap.get("size")+"个单词");
         			wordsNumLabel.setVisible(true);
         			startBtn.setEnabled(true);
+        			importWordBtn.setEnabled(true);
         			JOptionPane.showMessageDialog(this.getContentPane(), "加载成功", "系统信息", JOptionPane.WARNING_MESSAGE);
         		}else{
         			startBtn.setEnabled(false);
+        			importWordBtn.setEnabled(false);
         			wordsNumLabel.setVisible(false);
         			JOptionPane.showMessageDialog(this.getContentPane(), "加载失败,请检查excel格式是否符合要求", "系统信息", JOptionPane.WARNING_MESSAGE);
         		}
@@ -109,11 +132,42 @@ public class WordsFrameMain extends JFrame{
         }
 		return file;
 	}
+	private String importWord(){
+		JFileChooser jfc=new JFileChooser();  
+		jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES );  
+		jfc.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				String s = f.getName().toLowerCase();
+				if(s.endsWith(".docx")){
+					return true;
+				}
+				return false;
+			}
+			@Override
+			public String getDescription() {
+				return null;
+			}
+		});
+		jfc.showDialog(new JLabel(), "选择word(docx)文档");
+		File file=jfc.getSelectedFile();
+		if(file!=null){
+			if(file.isDirectory()){
+				JOptionPane.showMessageDialog(this.getContentPane(), "请选择一个docx文件", "系统信息", JOptionPane.WARNING_MESSAGE);
+			}else if(file.isFile()){  
+				return file.getPath();
+			}  
+		}
+		return null;
+	}
 
 	private void startFetch(){
 		startBtn.setEnabled(false);
 		List<String> words=(List<String>) wordsMap.get("words");
+		int sum=1;
 		for(String str:words){
+			wordsNumLabel.setText("抓取第"+sum+"个/共"+wordsMap.get("size")+"个");
+			sum++;
 			Map<String, String> map=new HashMap<>();
 			try{
 				String url="http://dict.youdao.com/jsonapi?q="+str;
@@ -168,8 +222,6 @@ public class WordsFrameMain extends JFrame{
 									String zhString=en.get("chn_sent").toString();
 									map.put("sentence_en", HtmlUtil.delHTMLTag(enString));
 									map.put("sentence_zh", HtmlUtil.delHTMLTag(zhString));
-//									System.out.println(HtmlUtil.delHTMLTag(enString));
-//									System.out.println(HtmlUtil.delHTMLTag(zhString));
 									mapData.add(map);
 								}
 								continue;
@@ -184,6 +236,86 @@ public class WordsFrameMain extends JFrame{
 		}
 		ExcelUtil.written(mapData);
 		JOptionPane.showMessageDialog(this.getContentPane(), "抓取完成", "系统信息", JOptionPane.WARNING_MESSAGE);
+	}
+	private void startFetchForWord(){
+		startBtn.setEnabled(false);
+		List<String> words=(List<String>) wordsMap.get("words");
+		int sum=1;
+		System.out.println(wordPath);
+		if(wordPath==null){
+			JOptionPane.showMessageDialog(this.getContentPane(), "请选择一个输出文件(docx)", "系统信息", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		for(String str:words){
+			wordsNumLabel.setText("抓取第"+sum+"个/共"+wordsMap.get("size")+"个");
+			Map<String, Object> map=new HashMap<>();
+			try{
+				String url="http://dict.youdao.com/jsonapi?q="+str;
+				map.put("name", str);
+				
+				String string = HttpClientUtil.get(url= url.replaceAll(" ", "%20"));
+				JSONObject object=JSONObject.fromObject(string);
+				JSONObject simple=(JSONObject) object.get("simple");
+				JSONObject ec=(JSONObject) object.get("ec");
+				if(simple!=null){
+					String usphone=getPhonic(simple);
+					map.put("phone","美"+usphone);
+					
+					JSONObject collins=(JSONObject) object.get("collins");
+					if(collins!=null){
+						JSONArray collins_entries=(JSONArray) collins.get("collins_entries");
+						JSONObject entriess=(JSONObject) collins_entries.get(0);
+						JSONObject entries=(JSONObject)entriess.get("entries");
+						if(entries!=null){
+							JSONArray entry=(JSONArray) entries.get("entry");
+							List<Map<String, Object>> enList = new ArrayList<>();
+							for(int i=0;i<entry.size();i++){
+								Map<String, Object> enMap=new HashMap<>();
+								JSONObject tran_entry=(JSONObject)entry.get(i);
+								JSONArray tran_entry2=(JSONArray)tran_entry.get("tran_entry");
+								JSONObject tran_entry_object=(JSONObject)tran_entry2.get(0);
+								if(tran_entry_object.get("tran")!=null){
+									String tran=tran_entry_object.get("tran").toString();
+									String pos="";
+									if(tran_entry_object.get("pos_entry")!=null){
+										if(((JSONObject)tran_entry_object.get("pos_entry")).get("pos")!=null){
+											pos += ((JSONObject)tran_entry_object.get("pos_entry")).get("pos").toString()+"  ";
+										}
+									}
+									if(!HtmlUtil.delHTMLTag(tran).equals(""))
+										enMap.put("en",(i+1)+"."+pos+HtmlUtil.delHTMLTag(tran));
+									List<String> example = new ArrayList<>();
+									JSONObject exam_sents=(JSONObject)tran_entry_object.get("exam_sents");
+									if(exam_sents!=null){
+										JSONArray sent=(JSONArray) exam_sents.get("sent");
+										for(int j=0;j<sent.size();j++){
+											JSONObject en=(JSONObject)sent.get(j);
+											String enString=en.get("eng_sent").toString();
+											String zhString=en.get("chn_sent").toString();
+											example.add(HtmlUtil.delHTMLTag(enString)+HtmlUtil.delHTMLTag(zhString));
+										}
+									}
+									enMap.put("example", example);
+									enList.add(enMap);
+								}
+							}
+							map.put("enList", enList);
+						}
+					}
+				}
+				wordMap.add(map);
+			}catch(Exception e){
+				e.printStackTrace();
+				wordMap.add(map);
+			}
+			sum++;
+		}
+		try {
+			WordUtil.write(wordPath, wordMap);
+			JOptionPane.showMessageDialog(this.getContentPane(), "抓取完成", "系统信息", JOptionPane.WARNING_MESSAGE);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(this.getContentPane(), "文档不存在或已打开,请关闭文档", "系统信息", JOptionPane.WARNING_MESSAGE);
+		}
 	}
 	private String getPhonic(JSONObject simple){
 		JSONArray word=(JSONArray) simple.get("word");
