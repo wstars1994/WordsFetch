@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -16,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -30,7 +28,8 @@ public class WordsFrameMain extends JFrame{
 	private String wordPath=null;
 	private JButton importBtn,startBtn,importWordBtn;
 	private JPanel mainPanel;
-	private JLabel wordsNumLabel,fetchNumLabel;
+	private static JLabel wordsNumLabel;
+	private JLabel fetchNumLabel;
 	private Map<String, Object> wordsMap=null;
 	List<Map<String, String>> mapData=new ArrayList<>();
 	List<Map<String, Object>> wordMap=new ArrayList<>();
@@ -229,8 +228,9 @@ public class WordsFrameMain extends JFrame{
 						}
 					}
 				}
-				mapData.add(map);
 			}catch(Exception e){
+				e.printStackTrace();
+			}finally {
 				mapData.add(map);
 			}
 		}
@@ -316,6 +316,9 @@ public class WordsFrameMain extends JFrame{
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this.getContentPane(), "文档不存在或已打开,请关闭文档", "系统信息", JOptionPane.WARNING_MESSAGE);
 		}
+	}
+	public static void updateUI(int num,int count){
+		wordsNumLabel.setText("正在保存到word:"+num+"/"+count);
 	}
 	private String getPhonic(JSONObject simple){
 		JSONArray word=(JSONArray) simple.get("word");
