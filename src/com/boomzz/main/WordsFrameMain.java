@@ -14,7 +14,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.filechooser.FileFilter;
+
+import com.boomzz.util.ExcelUtil;
+import com.boomzz.util.HtmlUtil;
+import com.boomzz.util.HttpClientUtil;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -61,6 +67,7 @@ public class WordsFrameMain extends JFrame{
 		this.addBtnListener(importWordBtn);
 		this.addBtnListener(startBtn);
 		this.add(mainPanel);
+		this.setResizable(false);// 去掉窗口的装饰 
 	}
 	private void addBtnListener(JButton btn){
 		btn.addActionListener(new ActionListener() {
@@ -75,7 +82,11 @@ public class WordsFrameMain extends JFrame{
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
-							startFetchForWord();
+							if(wordMap.size()>0){
+								writeToWord();
+							}else {
+								startFetchForWord();
+							}
 						}
 					}).start();
 				}
@@ -116,7 +127,7 @@ public class WordsFrameMain extends JFrame{
         	}else if(file.isFile()){  
         		wordsMap = ExcelUtil.read(file);
         		if(!wordsMap.get("size").equals("0")){
-        			wordsNumLabel.setText("共加载了"+wordsMap.get("size")+"个单词");
+        			wordsNumLabel.setText("本次共加载了"+wordsMap.get("size")+"个单词");
         			wordsNumLabel.setVisible(true);
         			startBtn.setEnabled(true);
         			importWordBtn.setEnabled(true);
@@ -165,7 +176,8 @@ public class WordsFrameMain extends JFrame{
 		List<String> words=(List<String>) wordsMap.get("words");
 		int sum=1;
 		for(String str:words){
-			wordsNumLabel.setText("抓取第"+sum+"个/共"+wordsMap.get("size")+"个");
+			str=str.trim();
+			wordsNumLabel.setText("正在抓取第"+sum+"个/共"+wordsMap.get("size")+"个");
 			sum++;
 			Map<String, String> map=new HashMap<>();
 			try{
@@ -228,14 +240,14 @@ public class WordsFrameMain extends JFrame{
 						}
 					}
 				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}finally {
 				mapData.add(map);
+			}catch(Exception e){
+				mapData.add(map);
+				e.printStackTrace();
 			}
 		}
 		ExcelUtil.written(mapData);
-		JOptionPane.showMessageDialog(this.getContentPane(), "抓取完成", "系统信息", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(this.getContentPane(), "完成", "系统信息", JOptionPane.INFORMATION_MESSAGE);
 	}
 	private void startFetchForWord(){
 		startBtn.setEnabled(false);
@@ -247,7 +259,8 @@ public class WordsFrameMain extends JFrame{
 			return;
 		}
 		for(String str:words){
-			wordsNumLabel.setText("抓取第"+sum+"个/共"+wordsMap.get("size")+"个");
+			str=str.trim();
+			wordsNumLabel.setText("正在抓取第"+sum+"个/共"+wordsMap.get("size")+"个");
 			Map<String, Object> map=new HashMap<>();
 			try{
 				String url="http://dict.youdao.com/jsonapi?q="+str;
@@ -310,15 +323,20 @@ public class WordsFrameMain extends JFrame{
 			}
 			sum++;
 		}
+		writeToWord();
+	}
+	
+	private void writeToWord(){
 		try {
 			WordUtil.write(wordPath, wordMap);
-			JOptionPane.showMessageDialog(this.getContentPane(), "抓取完成", "系统信息", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this.getContentPane(), "完成", "系统信息", JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this.getContentPane(), "文档不存在或已打开,请关闭文档", "系统信息", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this.getContentPane(), "文档不存在或已打开,请关闭文档或创建文档后,重新保存", "系统信息", JOptionPane.WARNING_MESSAGE);
 		}
 	}
+	
 	public static void updateUI(int num,int count){
-		wordsNumLabel.setText("正在保存到word:"+num+"/"+count);
+		wordsNumLabel.setText("请稍等,正在保存到文档: "+num);
 	}
 	private String getPhonic(JSONObject simple){
 		JSONArray word=(JSONArray) simple.get("word");

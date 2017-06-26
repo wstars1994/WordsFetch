@@ -1,4 +1,4 @@
-package com.boomzz.main;
+package com.boomzz.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

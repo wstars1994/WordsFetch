@@ -18,18 +18,20 @@ public class WordUtil {
 
 	private static XWPFParagraph curParagraph=null;
 	
-	public WordUtil() {
-	}
+	public WordUtil() { }
 	
 	public static void write(String filePath,List<Map<String, Object>> data) throws IOException{
-		
 		XWPFDocument doc = new XWPFDocument(new FileInputStream(filePath));
 		int i=1;
 		for(Map<String, Object> map:data){
 			WordsFrameMain.updateUI(i,map.size());
 			//创建标题
-			if(map.get("name")!=null)
-				createNewTitle(doc,map.get("name").toString());
+			if(map.get("name")!=null){
+				if(map.get("name").toString().matches("list\\s+[0-9]+")){
+					if(i!=1) createNewPage(doc);
+					createNewList(doc,map.get("name").toString());
+				}else createNewTitle(doc,map.get("name").toString());				
+			}
 			//创建音标行
 			if(map.get("phone")!=null)
 				createNewText(doc,map.get("phone").toString());
@@ -48,6 +50,7 @@ public class WordUtil {
 					}
 				}
 			}
+			createEnter(doc);
 			i++;
 		}
 		//写入文件
@@ -85,6 +88,22 @@ public class WordUtil {
 		createRun.setText(text);
 		createRun.setFontFamily("Times New Roman");
 		createRun.setBold(false);
+	}
+	private static void createNewList(XWPFDocument doc,String text){
+		XWPFRun createRun = createNewXWPFRun(doc);
+		createRun.setFontSize(15);
+		createRun.setText(text);
+		createRun.setFontFamily("Times New Roman");
+		createRun.setBold(true);
+	}
+	private static void createEnter(XWPFDocument doc){
+		XWPFRun createRun = createNewXWPFRun(doc);
+		createRun.setText("\n");
+	}
+	private static void createNewPage(XWPFDocument doc){
+		XWPFParagraph p = doc.createParagraph();
+		//给这个段落添加一个分隔符即可。
+		p.setPageBreak(true);
 	}
 	private static void createNewTextExample(XWPFDocument doc,String text){
 		XWPFRun createRun = createNewXWPFRun(doc);

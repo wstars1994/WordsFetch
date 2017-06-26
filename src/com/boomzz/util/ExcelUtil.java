@@ -1,4 +1,4 @@
-package com.boomzz.main;
+package com.boomzz.util;
 
 import java.io.File;
 import java.io.FileInputStream;
