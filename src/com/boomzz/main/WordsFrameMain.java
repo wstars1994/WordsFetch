@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.filechooser.FileFilter;
 
 import com.boomzz.util.ExcelUtil;
@@ -29,6 +29,7 @@ import net.sf.json.JSONObject;
  * @author wxc
  *
  */
+@SuppressWarnings("serial")
 public class WordsFrameMain extends JFrame{
 	
 	private String[] btnText={"导入词汇","存为word","存为excel"};
@@ -254,7 +255,6 @@ public class WordsFrameMain extends JFrame{
 		startBtn.setEnabled(false);
 		List<String> words=(List<String>) wordsMap.get("words");
 		int sum=1;
-		System.out.println(wordPath);
 		if(wordPath==null){
 			JOptionPane.showMessageDialog(this.getContentPane(), "请选择一个输出文件(docx)", "系统信息", JOptionPane.WARNING_MESSAGE);
 			return;
