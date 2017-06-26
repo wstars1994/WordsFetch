@@ -20,6 +20,7 @@ import javax.swing.filechooser.FileFilter;
 import com.boomzz.util.ExcelUtil;
 import com.boomzz.util.HtmlUtil;
 import com.boomzz.util.HttpClientUtil;
+import com.boomzz.util.WordUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

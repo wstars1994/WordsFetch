@@ -1,4 +1,4 @@
-package com.boomzz.main;
+package com.boomzz.util;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,6 +13,8 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTShd;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSpacing;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STShd;
+
+import com.boomzz.main.WordsFrameMain;
 
 public class WordUtil {
 
