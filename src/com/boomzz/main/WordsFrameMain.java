@@ -61,7 +61,7 @@ public class WordsFrameMain extends JFrame{
 		startBtn.setEnabled(false);
 		importWordBtn.setEnabled(false);
 		mainPanel.add(importBtn);
-//		mainPanel.add(importWordBtn);
+		mainPanel.add(importWordBtn);
 		mainPanel.add(startBtn);
 		mainPanel.add(wordsNumLabel);
 		mainPanel.add(fetchNumLabel);
