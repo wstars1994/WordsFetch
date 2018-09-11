@@ -45,7 +45,7 @@ public class WordsFrameMain extends JFrame{
 		this.init();
 	}
 	private void init(){
-		this.setTitle("单词抓取工具");
+		this.setTitle("单词抓取");
 		this.setSize(400, 100);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,7 +61,7 @@ public class WordsFrameMain extends JFrame{
 		startBtn.setEnabled(false);
 		importWordBtn.setEnabled(false);
 		mainPanel.add(importBtn);
-		mainPanel.add(importWordBtn);
+//		mainPanel.add(importWordBtn);
 		mainPanel.add(startBtn);
 		mainPanel.add(wordsNumLabel);
 		mainPanel.add(fetchNumLabel);
@@ -206,7 +206,7 @@ public class WordsFrameMain extends JFrame{
 				}
 				map.put("tras",tras);
 				if(simple!=null){
-					String usphone=getPhonic(simple);
+					String usphone=getPhonic(simple);	
 					map.put("phone",usphone);
 					JSONObject collins=(JSONObject) object.get("collins");
 					if(collins!=null){

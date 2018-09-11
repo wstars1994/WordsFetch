@@ -40,9 +40,15 @@ public class HttpClientUtil {
         return content;
     }
     public static void main(String[] args) {
-    	String url="http://dict.youdao.com/jsonapi?q=frayed";
-		System.out.println(url);
-		String contentString=HttpClientUtil.get(url);
-		System.out.println(contentString);
+    	String word[]={"apple","pen"};
+    	for(String str:word){
+    		System.out.println(str+"----------------------------------");
+    		String url="http://dict.youdao.com/dictvoice?audio="+str+"&type=2";
+    		String contentString=HttpClientUtil.get(url);
+    		System.out.println(contentString);
+    	}
+//    	String url="http://dict.youdao.com/jsonapi?q=frayed";
+//		System.out.println(url);
+//		String contentString=HttpClientUtil.get(url);
 	}
 }
